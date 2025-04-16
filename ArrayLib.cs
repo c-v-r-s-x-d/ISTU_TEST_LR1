@@ -1,27 +1,18 @@
-﻿namespace ISTU_TEST_LR1;
+﻿using System.Globalization;
+
+namespace ISTU_TEST_LR1;
 
 public static class ArrayLib
 {
-    public static Result Do(double[]? array)
+    public static Result Do(string[] array)
     {
         var errors = new List<string>();
-
-        if (array is null)
-        {
-            errors.Add("Input array is null.");
-            return new Result
-            {
-                Array = Array.Empty<double>(),
-                MaxElement = double.NaN,
-                Errors = errors
-            };
-        }
 
         var n = array.Length;
 
         if (n == 0)
         {
-            errors.Add("Input array is empty.");
+            errors.Add("Input array is empty");
             return new Result
             {
                 Array = Array.Empty<double>(),
@@ -30,23 +21,52 @@ public static class ArrayLib
             };
         }
 
-        var resultArray = new double[n];
-        array.CopyTo(resultArray, 0);
+        if (n > 1024)
+        {
+            errors.Add("Input array is too large");
+            return new Result
+            {
+                Array = Array.Empty<double>(),
+                MaxElement = double.NaN,
+                Errors = errors
+            };
+        }
+
+        double[] parsedArray;
+        try
+        {
+            parsedArray = array.Select(x => double.Parse(x, CultureInfo.InvariantCulture)).ToArray();
+            if (parsedArray.Any(x => x is double.NegativeInfinity or double.PositiveInfinity))
+            {
+                throw new FormatException();
+            }
+        }
+        catch (FormatException)
+        {
+            errors.Add("The number is outside the range of double");
+            return new Result
+            {
+                Array = Array.Empty<double>(),
+                MaxElement = double.NaN,
+                Errors = errors
+            };
+        }
 
         var maxSum = double.MinValue;
-        var half = n / 2;
+        var half = (n + 1) / 2;
 
+        var resultArray = new double[half];
         for (var i = 0; i < half; i++)
         {
-            var sum = array[i] + array[n - 1 - i];
+            var sum = parsedArray[i] + parsedArray[n - 1 - i];
+            resultArray[i] = sum;
             if (sum > maxSum)
                 maxSum = sum;
         }
 
         if (n % 2 == 1)
         {
-            var middleIndex = n / 2;
-            resultArray[middleIndex] = array[middleIndex] * 2;
+            resultArray[(half+1)/2] *= 2;
         }
         
         return new Result
