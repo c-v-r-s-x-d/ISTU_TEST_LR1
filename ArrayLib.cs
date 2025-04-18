@@ -59,6 +59,16 @@ public static class ArrayLib
         for (var i = 0; i < half; i++)
         {
             var sum = parsedArray[i] + parsedArray[n - 1 - i];
+            if (sum is double.NegativeInfinity or double.PositiveInfinity)
+            {
+                errors.Add("The number is outside the range of double");
+                return new Result
+                {
+                    Array = Array.Empty<double>(),
+                    MaxElement = double.NaN,
+                    Errors = errors
+                };
+            }
             resultArray[i] = sum;
             if (sum > maxSum)
                 maxSum = sum;
@@ -66,7 +76,9 @@ public static class ArrayLib
 
         if (n % 2 == 1)
         {
-            resultArray[(half+1)/2] *= 2;
+            resultArray[half-1] *= 2;
+            if (resultArray[half-1] > maxSum)
+                maxSum = resultArray[half-1];
         }
         
         return new Result

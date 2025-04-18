@@ -61,6 +61,23 @@ public class ArrayLibTests
         result.Errors.Should().ContainSingle(x => string.Equals("The number is outside the range of double", x));
     }
 
+    [Theory]
+    [InlineData(double.MinValue)]
+    [InlineData(double.MaxValue)]
+    public void When_ArrayElementsIsBoundOfDoubleRange_Then_CorrectErrorReturned(double element)
+    {
+        // arrange
+        var array = new[] {"1", element.ToString(CultureInfo.InvariantCulture), "3"};
+
+        // act
+        var result = ArrayLib.Do(array);
+
+        // assert
+        result.Array.Should().BeEquivalentTo(Array.Empty<double>());
+        result.MaxElement.Should().Be(double.NaN);
+        result.Errors.Should().ContainSingle(x => string.Equals("The number is outside the range of double", x));
+    }
+
     [Fact]
     public void When_ArrayHasEvenNumberOfElements_And_AllPairSumsEqualDoubleMin_Then_CorrectResultReturned()
     {
@@ -148,7 +165,41 @@ public class ArrayLibTests
         result.MaxElement.Should().Be(double.MinValue);
         result.Errors.Should().BeEmpty();
     }
-    
+
+    [Fact]
+    public void When_RandomArray_Then_CorrectResultReturned()
+    {
+        // arrange
+        const int testNumber = 8;
+        
+        var random = new Random();
+        var array = new string[GetArrayLength(testNumber)];
+
+        for (var i = 0; i < array.Length; i++)
+        {
+            array[i] = random.NextDouble().ToString(CultureInfo.InvariantCulture);
+        }
+        
+        // act
+        var result = ArrayLib.Do(array);
+
+        // assert
+        var expectedArray = new double[(array.Length + 1) / 2];
+        for (var i = 0; i < expectedArray.Length; i++)
+        {
+            expectedArray[i] = double.Parse(array[i], CultureInfo.InvariantCulture) +
+                               double.Parse(array[array.Length - 1 - i], CultureInfo.InvariantCulture);
+
+            if (i == array.Length / 2 && expectedArray.Length % 2 == 1)
+            {
+                expectedArray[i] *= 2;
+            }
+        }
+        
+        result.Array.Should().BeEquivalentTo(expectedArray);
+        result.MaxElement.Should().Be(expectedArray.Max());
+        result.Errors.Should().BeEmpty();
+    }
 
     private static int GetArrayLength(int testNumber)
     {
