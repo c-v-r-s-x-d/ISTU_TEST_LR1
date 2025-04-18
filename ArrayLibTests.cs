@@ -98,12 +98,33 @@ public class ArrayLibTests
         result.MaxElement.Should().Be(double.MinValue);
         result.Errors.Should().BeEmpty();
     }
+    
+    [Fact]
+    public void When_ArrayHasEvenNumberOfElements_And_AllPairSumsEqualDoubleMax_Then_CorrectResultReturned()
+    {
+        // arrange
+        const int testNumber = 5;
+        
+        var array = new string[GetArrayLength(testNumber) | 0];
+        for (var i = 0; i < array.Length; i++)
+        {
+            array[i] = (double.MaxValue / 2).ToString(CultureInfo.InvariantCulture);
+        }
+
+        // act
+        var result = ArrayLib.Do(array);
+
+        // assert
+        result.Array.Should().HaveCount((array.Length + 1) / 2);
+        result.MaxElement.Should().Be(double.PositiveInfinity);
+        result.Errors.Should().BeEmpty();
+    }
 
     [Fact]
     public void When_ArrayHasEvenNumberOfElements_And_AllPairSumsMoreThenMinDouble_Then_CorrectResultReturned()
     {
         // arrange
-        const int testNumber = 5;
+        const int testNumber = 6;
 
         var random = new Random();
         var array = new string[GetArrayLength(testNumber) | 0];
@@ -126,7 +147,7 @@ public class ArrayLibTests
     public void When_ArrayHasOddNumberOfElements_And_AllPairSumsMoreThenDoubleMin_Then_CorrectResultReturned()
     {
         // arrange
-        const int testNumber = 6;
+        const int testNumber = 7;
 
         var random = new Random();
         var array = new string[GetArrayLength(testNumber) | 1];
@@ -149,7 +170,7 @@ public class ArrayLibTests
     public void When_ArrayHasOddNumberOfElements_And_AllPairSumsEqualDoubleMin_Then_CorrectResultReturned()
     {
         // arrange
-        const int testNumber = 7;
+        const int testNumber = 8;
         var array = new string[GetArrayLength(testNumber) | 1];
         
         for (var i = 0; i < array.Length; i++)
@@ -165,12 +186,33 @@ public class ArrayLibTests
         result.MaxElement.Should().Be(double.MinValue);
         result.Errors.Should().BeEmpty();
     }
+    
+    [Fact]
+    public void When_ArrayHasOddNumberOfElements_And_AllPairSumsEqualDoubleMax_Then_CorrectResultReturned()
+    {
+        // arrange
+        const int testNumber = 9;
+        var array = new string[GetArrayLength(testNumber) | 1];
+        
+        for (var i = 0; i < array.Length; i++)
+        {
+            array[i] = (double.MaxValue / 2).ToString(CultureInfo.InvariantCulture);
+        }
+        
+        // act
+        var result = ArrayLib.Do(array);
+        
+        // assert
+        result.Array.Should().HaveCount((array.Length + 1) / 2);
+        result.MaxElement.Should().Be(double.PositiveInfinity);
+        result.Errors.Should().BeEmpty();
+    }
 
     [Fact]
     public void When_RandomArray_Then_CorrectResultReturned()
     {
         // arrange
-        const int testNumber = 8;
+        const int testNumber = 10;
         
         var random = new Random();
         var array = new string[GetArrayLength(testNumber)];
